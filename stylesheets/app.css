@@ -1,0 +1,310 @@
+@font-face {
+  font-family: 'OpenSansRegular';
+  src: url("../fonts/OpenSans-Regular-webfont.eot");
+  src: url("../fonts/OpenSans-Regular-webfont.eot?#iefix") format("embedded-opentype"), url("../fonts/OpenSans-Regular-webfont.woff") format("woff"), url("../fonts/OpenSans-Regular-webfont.ttf") format("truetype"), url("../fonts/OpenSans-Regular-webfont.svg#OpenSansRegular") format("svg");
+  font-weight: normal;
+  font-style: normal;
+  -webkit-font-smoothing: antialiased;
+}
+/*
+ * Addresses font-family inconsistency between 'textarea' and other form elements.
+ */
+
+html, button, input
+/*select,
+textarea */
+
+{
+  height:100%;
+  font-family: sans-serif;
+}
+h1, h2, h3, h4, h5, h6 {
+  color: #e8e8e8;
+  margin: 0 0 10px;
+  font-family: 'OpenSansRegular', "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: normal;
+}
+/*
+ * Addresses margins handled incorrectly in IE6/7
+ */
+
+body {
+  height:100%;
+  margin: 0;
+  font: 14px/1.5 "OpenSansRegular", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  background: #101010;
+}
+h1, h2, h3 {
+  line-height: 1.1;
+}
+input[type=checkbox] {
+  visibility: hidden;
+}
+/* SQUARED THREE */
+
+.checkbox {
+  display: inline-block;
+  cursor: pointer;
+  font-size: 13px;
+  margin-right: 10px;
+  line-height: 18px;
+}
+input[type=checkbox] {
+  display: none;
+}
+.checkbox:before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  /* vertical-align: middle; */
+
+  background-color: #242525;
+  color: #EAEAEA;
+  text-align: center;
+  box-shadow: inset 0px 2px 3px 0px rgba(0, 0, 0, 0.56), 0px 1px 0px 0px rgba(255, 255, 255, 0.33);
+  border-radius: 3px;
+  margin-right: 9px;
+  pointer-events: none;
+}
+input[type=checkbox]:checked + .checkbox:before {
+  content: "\2713";
+  text-shadow: 1px 1px 1px rgba(0, 0, 0, .2);
+}
+label.checkbox {
+  -webkit-user-select: none;
+  /* Chrome/Safari */
+
+  -moz-user-select: none;
+  /* Firefox */
+
+  -ms-user-select: none;
+  /* IE10+ */
+  /* Rules below not implemented in browsers yet */
+
+  -o-user-select: none;
+  user-select: none;
+  text-overflow: ellipsis;
+  /* white-space: nowrap; */
+
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+}
+.sidebar {
+  background: #060606;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: absolute;
+  top: 81px;
+  bottom: 0;
+  left: 0;
+  width: 320px;
+  height:100%;
+}
+.sidebar-buttonbar {
+  margin-left: 45px;
+}
+.sidebar_title {
+  width: 320px;
+  height: 81px;
+  background: #434343;
+  /*border-right: 4px solid #434343;*/
+
+  text-align: left;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.sidebar_title h1 {
+  font-size: 19px;
+  margin-top: 20px;
+  margin-left: 44px;
+}
+.sidebar_header {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.7rem;
+  font-weight: bold;
+  /* height: 42px; */
+
+  overflow: hidden;
+  padding: 12px 12px 5px 12px;
+  position: relative;
+  background-color: #080808;
+  text-transform: uppercase;
+}
+.sidebar_header_text {
+  display: inline-block;
+  margin: 0;
+  position: relative;
+  /* top: -2px; */
+
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.27);
+  /* background-color: #999; */
+
+  font-weight: bold;
+  font-family: "Avenir Next W01", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+.sidebar ul {
+  margin-top: 0px;
+}
+.sidebar ul li {
+  -webkit-transition: all 200ms linear;
+  -moz-transition: all 200ms linear;
+  transition: all 200ms linear;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.95);
+  /*cursor: pointer;*/
+
+  font-size: 0.8rem;
+  height: 42px;
+  /*line-height: 42px;*/
+
+  padding: 0 20px;
+  display: block;
+  list-style-type: none;
+  padding: 0px;
+  padding-bottom: 8px;
+  padding-top: 8px;
+  width: 270px;
+}
+.sidebar .info, .sidebar .info2{
+  color: rgba(255, 255, 255, 0.50);
+}
+.sidebar .info2 {
+  position: absolute;
+  left: 153px;
+}
+.sidebar .info-count {
+  color: rgba(255, 255, 255, 0.6);
+}
+.main {
+  width: 950px;
+  height: 100%;
+  background: #101010;
+  /* border-right: 4px solid #434343; */
+
+  text-align: left;
+  position: absolute;
+  top: 0;
+  left: 320px;
+  color: #B5B5B5;
+}
+.template {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  margin-left: 20px;
+  width: 440px;
+}
+.template span {
+  font-weight: bold;
+}
+.template textarea, .template textarea:focus {
+  margin-top: 6px;
+  width: 415px;
+  background-color: #242525;
+  color: #EAEAEA;
+  box-shadow: inset 1px 2px 3px 0px rgba(0, 0, 0, 0.28), 1px 1px 2px 1px rgba(255, 255, 255, 0.32);
+  border: none;
+  outline-width: thin;
+  outline-color: #FFF;
+  padding: 5px;
+}
+
+.legend {
+  position: absolute;
+left: 481px;
+top: 20px;
+padding-right: 20px;
+}
+.legend span {
+  font-weight: bold;
+}
+.legend textarea, .legend textarea:focus {
+  height: 572px;
+  margin-top: 6px;
+  width: 415px;
+  background-color: #717171;
+  color: #000000;
+  /* box-shadow: inset 1px 2px 3px 0px rgba(0, 0, 0, 0.28), 1px 1px 2px 1px rgba(255, 255, 255, 0.32); */
+  border: none;
+  outline-width: thin;
+  outline-color: #FFF;
+  padding: 5px;
+  resize: none;
+}
+
+.legend textarea {
+  display:none;
+}
+
+.legend[legend="instructions"] .instructions{
+  display:block;
+}
+
+.legend[legend="header"] .header{
+  display:block;
+}
+
+.legend[legend="root"] .root{
+  display:block;
+}
+
+.legend[legend="dir"] .dir{
+  display:block;
+}
+
+.legend[legend="file"] .file{
+  display:block;
+}
+
+.legend[legend="footer"] .footer{
+  display:block;
+}
+
+.btn {
+  background-color: #E4E4E4;
+  color: #000000;
+  font-family: 'Helvetica Neue',sans-serif;
+  font-size: 14px;
+  line-height: 16px;
+  border-radius: 20px;
+  -webkit-border-radius: 20px;
+  -moz-border-radius: 20px;
+  border: 0;
+  /* text-shadow: #D5D5D5 0 -1px 0; */
+  /* width: 120px; */
+  /* height: 32px; */
+  margin-right: 5px;
+  cursor: pointer;
+}
+.btn:disabled{
+  opacity:0.5;
+  cursor:auto;
+}
+#load {
+	position: relative;
+	overflow: hidden;
+}
+
+#load input.upload {
+	position: absolute;
+	top: 0;
+	right: 0;
+	margin: 0;
+	padding: 0;
+	font-size: 20px;
+	cursor: pointer;
+	opacity: 0;
+	filter: alpha(opacity=0);
+}
+
+#progress {
+  height: 3px;
+  background-color: #fff;
+  width: 0%;
+  bottom: 0px;
+  left: 0px;
+  position: absolute;
+}

@@ -1,0 +1,211 @@
+<!doctype html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=1">
+  <title>Locate32js by PAEz</title>
+  <link rel="stylesheet" href="stylesheets/app.css">
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+</head>
+
+<body>
+  <div class="sidebar_title">
+    <h1>Locate32 File List Exporter</h1>
+    <div class="sidebar-buttonbar">
+      <button class="btn" id='load'>
+        <span>Load</span>
+        <input type="file" class="upload" id="fileinput"/>
+      </button>
+      <button type="button" id="generate" class='btn' disabled>Generate</button>
+      <button type="button" id="save" class='btn' disabled>Save</button>
+    </div>
+    <div id="progress" style="width:0%;">
+    </div>
+  </div>
+  <div id="sidebar" class="sidebar">
+    <div class="sidebar_header">
+      <h1 class="sidebar_header_text">Roots</h1>
+    </div>
+    <ul id="rootlist">
+      <li>
+        <input id="Option" type="checkbox">
+        <label class="checkbox" for="Option">C:/</label>
+        <span class='info'>Files: </span>
+        <span class='info-count'>365552111</span>
+        <span class='info2'> Directories:
+          <span class='info-count'>1220030</span>
+        </span>
+      </li>
+      <li>
+        <input id="Option1" type="checkbox">
+        <label class="checkbox" for="Option1">E:/Portables/</label>
+        <span class='info'>Files: </span>
+        <span class='info-count'>5322111</span>
+        <span class='info2'> Directories:
+          <span class='info-count'>12320030</span>
+        </span>
+      </li>
+      <li>
+        <input id="Option2" type="checkbox">
+        <label class="checkbox" for="Option2">F:/</label>
+        <span class='info'>Files: </span>
+        <span class='info-count'>876322111</span>
+        <span class='info2'> Directories:
+          <span class='info-count'>12331120030</span>
+        </span>
+      </li>
+    </ul>
+  </div>
+  <!-- end header -->
+  <div class="main">
+    <div class="template">
+      <span>Header</span>
+      <br>
+      <textarea name="header" rows="4" spellcheck="false">Locate32 File List
+Creator: {{creator}}
+Description: {{description}}
+Files: {{files}} Directories: {{directories}}
+DB Created: {{date}}
+
+
+</textarea>
+    </div>
+    <div class="template">
+      <span>Root</span>
+      <br>
+      <textarea name="root" rows="4" spellcheck="false">
+
+Volume: {{path}}\
+Files: {{files}} Directories: {{directories}}
+
+</textarea>
+    </div>
+    <div class="template">
+      <span>Directory</span>
+      <br>
+      <textarea name="dir" rows="4" spellcheck="false">{{path}}{{name}}\
+</textarea>
+    </div>
+    <div class="template">
+      <span>File</span>
+      <br>
+      <textarea name="file" rows="4" spellcheck="false">{{path}}{{name}}    {{size}}bytes
+</textarea>
+    </div>
+    <!-- <div class="template">
+      <span>Directory End</span>
+      <br>
+      <textarea name="dirend" rows="4" spellcheck="false"></textarea>
+    </div>
+    <div class="template">
+      <span>Root End</span>
+      <br>
+      <textarea name="rootend" rows="4" spellcheck="false"></textarea>
+    </div> -->
+    <div class="template">
+      <span>Footer</span>
+      <br>
+      <textarea name="footer" rows="4" spellcheck="false">
+
+{{date}}
+</textarea>
+    </div>
+    <div class="legend" legend="instructions">
+      <!-- <span>End</span><br> -->
+      <textarea spellcheck="false" class="instructions" readonly>
+Locate32 File List Exporter
+
+Instructions
+------------
+Click load.
+If it can recognise and parse the db a list of roots will appear on the left.
+Select the roots you'd like to export.
+Click generate and wait for it to finish scanning.
+When finished click save.
+
+Template
+--------
+The textareas in the centre are for creating the template.
+
+Notes
+-----
+This is not able to handle short file names or ansi, it only does Unicode.
+      </textarea>
+      <textarea spellcheck="false" class="header" readonly>Header:
+  creator : The creator of the db
+  description : Desciption of the db
+  files : Total files count
+  directories : Total direcotries count
+  created : DB creation date in readable format
+  createdRaw : DB creation date in unix/windows format
+  date: The current date in readable format
+  dateRaw: The current date in unix/windows format
+      </textarea>
+      <textarea spellcheck="false" class="root" readonly>Root:
+  path : Path to root directory
+  type : Type of volume (fixed, directory, CD, etc)
+  name : Name of volume
+  serial : Serial number of volume
+  filesystem : File system of volume (NTFS , FAT, etc)
+  files : Total files count
+  directories : Total direcotries count
+      </textarea>
+      <textarea spellcheck="false" class="file" readonly>File:
+  path : Path to current item
+  name : Name of current item
+  size : Size of current item
+  modified: Modified date in readable format
+  modifiedRaw : Modified date in unix/windows format
+  created: Creation date in readable format
+  createdRaw : Creation date in unix/windows format
+
+Attribtes (will be either true or false)
+  hidden : Is the file hidden
+  readonly : Is the file readonly
+  archive : Is the file an archive
+  system : Is it a system file
+  symlink : Is it a symlink
+  junction : Is it a junction/ mount point.
+  file : Is it a file
+  directory : Is it a directory
+      </textarea>
+      <textarea spellcheck="false" class="dir" readonly>Directory:
+  path : Path to current item
+  name : Name of current item
+  modified: Modified date in readable format
+  modifiedRaw : Modified date in unix/windows format
+  created: Creation date in readable format
+  createdRaw : Creation date in unix/windows format
+
+Attribtes (will be either true or false)
+  hidden : Is the file hidden
+  readonly : Is the file readonly
+  archive : Is the file an archive
+  system : Is it a system file
+  symlink : Is it a symlink
+  junction : Is it a junction/ mount point.
+  file : Is it a file
+  directory : Is it a directory
+      </textarea>
+      <textarea spellcheck="false" class="footer" readonly>Footer:
+  creator : The creator of the db
+  description : Desciption of the db
+  files : Total files count
+  directories : Total direcotries count
+  created : DB creation date in readable format
+  createdRaw : DB creation date in unix/windows format
+  date: The current date in readable format
+  dateRaw: The current date in unix/windows format
+      </textarea>
+    </div>
+  </div>
+  <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+  <script src="./locate32/bytes.js"></script>
+  <script src="./locate32/chunks.js"></script>
+  <script src="./locate32/locate32.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
