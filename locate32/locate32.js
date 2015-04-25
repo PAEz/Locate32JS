@@ -353,3 +353,20 @@ Locate32.prototype.findPath = function(root,dir) {
   item.fullPath = fullPath;
   return item;
 }
+
+// Converts a locate32 date (DosDateTime) to js
+Locate32.prototype.convertDate = function(date){
+var low =date&0xffff;
+var high = (date&0xffff0000)>>16;
+
+var day = low&0b11111;
+var month = (low&0b111100000)>>5;
+var year = ((low&0b1111111000000000)>>9)+1980;
+
+var second = (high&0b11111)*2;
+var minute = (high&0b11111100000)>>5;
+var hour = (high&0b1111100000000000)>>11;
+
+return new Date(year, month, day, hour, minute, second);
+
+}

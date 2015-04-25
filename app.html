@@ -67,7 +67,7 @@
 Creator: {{creator}}
 Description: {{description}}
 Files: {{files}} Directories: {{directories}}
-DB Created: {{date}}
+DB Created: {{created}}
 
 
 </textarea>
@@ -85,7 +85,7 @@ Files: {{files}} Directories: {{directories}}
     <div class="template">
       <span>Directory</span>
       <br>
-      <textarea name="dir" rows="4" spellcheck="false">{{path}}{{name}}\
+      <textarea name="directory" rows="4" spellcheck="false">{{path}}{{name}}\
 </textarea>
     </div>
     <div class="template">
@@ -138,10 +138,22 @@ This is not able to handle short file names or ansi, it only does Unicode.
   description : Desciption of the db
   files : Total files count
   directories : Total direcotries count
-  created : DB creation date in readable format
-  createdRaw : DB creation date in unix/windows format
+  created: Creation date in readable format
+  created_year: Year created
+  created_month: Month created
+  created_day: Day created
+  created_hour: Hour created
+  created_minute: Minute created
+  created_second: Second created
+  createdRaw : Creation date in DosDateTime format
   date: The current date in readable format
   dateRaw: The current date in unix/windows format
+
+Date info
+  Months are from 1 to 12 (1 = Jan, 2 = Feb, etc.)
+  Hours are from 0 to 23 on a 24 hour clock
+  Minutes are from 0 to 59
+  Seconds are from 0 to 59
       </textarea>
       <textarea spellcheck="false" class="root" readonly>Root:
   path : Path to root directory
@@ -157,9 +169,21 @@ This is not able to handle short file names or ansi, it only does Unicode.
   name : Name of current item
   size : Size of current item
   modified: Modified date in readable format
-  modifiedRaw : Modified date in unix/windows format
+  modified_year: Year modified
+  modified_month: Month modified
+  modified_day: Day modified
+  modified_hour: Hour odified
+  modified_minute: Minute modified
+  modified_second: Second modified
+  modifiedRaw : Modified date in DosDateTime format
   created: Creation date in readable format
-  createdRaw : Creation date in unix/windows format
+  created_year: Year created
+  created_month: Month created
+  created_day: Day created
+  created_hour: Hour created
+  created_minute: Minute created
+  created_second: Second created
+  createdRaw : Creation date in DosDateTime format
 
 Attribtes (will be either true or false)
   hidden : Is the file hidden
@@ -167,17 +191,35 @@ Attribtes (will be either true or false)
   archive : Is the file an archive
   system : Is it a system file
   symlink : Is it a symlink
-  junction : Is it a junction/ mount point.
+  junction : Is it a junction / mount point.
   file : Is it a file
   directory : Is it a directory
+
+Date info
+  Months are from 1 to 12 (1 = Jan, 2 = Feb, etc.)
+  Hours are from 0 to 23 on a 24 hour clock
+  Minutes are from 0 to 59
+  Seconds are from 0 to 59
       </textarea>
-      <textarea spellcheck="false" class="dir" readonly>Directory:
+      <textarea spellcheck="false" class="directory" readonly>Directory:
   path : Path to current item
   name : Name of current item
   modified: Modified date in readable format
-  modifiedRaw : Modified date in unix/windows format
+  modified_year: Year modified
+  modified_month: Month modified
+  modified_day: Day modified
+  modified_hour: Hour odified
+  modified_minute: Minute modified
+  modified_second: Second modified
+  modifiedRaw : Modified date in DosDateTime format
   created: Creation date in readable format
-  createdRaw : Creation date in unix/windows format
+  created_year: Year created
+  created_month: Month created
+  created_day: Day created
+  created_hour: Hour created
+  created_minute: Minute created
+  created_second: Second created
+  createdRaw : Creation date in DosDateTime format
 
 Attribtes (will be either true or false)
   hidden : Is the file hidden
@@ -185,19 +227,37 @@ Attribtes (will be either true or false)
   archive : Is the file an archive
   system : Is it a system file
   symlink : Is it a symlink
-  junction : Is it a junction/ mount point.
+  junction : Is it a junction / mount point.
   file : Is it a file
   directory : Is it a directory
+
+Date info
+  Months are from 1 to 12 (1 = Jan, 2 = Feb, etc.)
+  Hours are from 0 to 23 on a 24 hour clock
+  Minutes are from 0 to 59
+  Seconds are from 0 to 59
       </textarea>
       <textarea spellcheck="false" class="footer" readonly>Footer:
   creator : The creator of the db
   description : Desciption of the db
   files : Total files count
   directories : Total direcotries count
-  created : DB creation date in readable format
-  createdRaw : DB creation date in unix/windows format
+  created: Creation date in readable format
+  created_year: Year created
+  created_month: Month created
+  created_day: Day created
+  created_hour: Hour created
+  created_minute: Minute created
+  created_second: Second created
+  createdRaw : Creation date in DosDateTime format
   date: The current date in readable format
   dateRaw: The current date in unix/windows format
+
+Date info
+  Months are from 1 to 12 (1 = Jan, 2 = Feb, etc.)
+  Hours are from 0 to 23 on a 24 hour clock
+  Minutes are from 0 to 59
+  Seconds are from 0 to 59
       </textarea>
     </div>
   </div>
