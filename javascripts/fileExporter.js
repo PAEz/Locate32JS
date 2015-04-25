@@ -475,6 +475,7 @@ $.generate.addEventListener('click', function(e) {
 							else {
 								// true end
 								console.timeEnd('Scan Took');
+                console.log('totals',totals)
 								list += template['footer'].func(locate.header, date, dateRaw);
 								$.save.removeAttribute('disabled');
 								$.load.removeAttribute('disabled');
