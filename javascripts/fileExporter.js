@@ -28,7 +28,8 @@ var dirty = {};
 Object.keys($.template).forEach(function(key) {
 	dirty[key] = false;
 });
-
+dirty.progress = 0;
+dirty.progressLast = 0;
 
 var template = {
 	header: {
@@ -202,17 +203,22 @@ templateKeys.forEach(function(key) {
 })
 
 function onFrame() {
-	var dirty = false;
-	for (var i = 0, iEnd = templateKeys.length; i < iEnd; i += 1) {
-		var key = templateKeys[i];
-		if (template[key].dirty) {
-			template[key].dirty = false;
-			templateData[key] = $.template[key].value;
-			dirty = true;
+	if (dirty.progress !== dirty.progressLast) {
+		$.progress.style.width = dirty.progress + '%';
+		dirty.progressLast = dirty.progress;
+	} else {
+		var update = false;
+		for (var i = 0, iEnd = templateKeys.length; i < iEnd; i += 1) {
+			var key = templateKeys[i];
+			if (template[key].dirty) {
+				template[key].dirty = false;
+				templateData[key] = $.template[key].value;
+				update = true;
+			}
 		}
-	}
-	if (dirty) {
-		localStorage['templateData'] = JSON.stringify(templateData);
+		if (update) {
+			localStorage['templateData'] = JSON.stringify(templateData);
+		}
 	}
 	window.requestAnimationFrame(onFrame);
 }
@@ -310,8 +316,8 @@ Object.keys($.template).forEach(function(legend) {
 		el.addEventListener('input', function(e) {
 			// $.legend.container.setAttribute('legend', el.getAttribute('name'));
 			console.log(el.name)
-      template[el.name].dirty = true;
-			
+			template[el.name].dirty = true;
+
 		});
 	}
 })
@@ -475,12 +481,13 @@ $.generate.addEventListener('click', function(e) {
 							else {
 								// true end
 								console.timeEnd('Scan Took');
-                console.log('totals',totals)
+								console.log('totals', totals)
 								list += template['footer'].func(locate.header, date, dateRaw);
 								$.save.removeAttribute('disabled');
 								$.load.removeAttribute('disabled');
 								$.generate.removeAttribute('disabled');
-								$.progress.style.width = '0%';
+								// $.progress.style.width = '0%';
+								dirty.progress = 0;
 							}
 							return;
 							// console.log(files)
@@ -505,10 +512,11 @@ $.generate.addEventListener('click', function(e) {
 					}
 				} else if (item.attrs.directory) {
 					createDates(item);
-					dCount++;
+					dCount+=1;
 					list += template['directory'].func(item, path, date, dateRaw);
 					totalsCount += 1;
-					$.progress.style.width = ((totalsCount / totals) * 100) + '%';
+					dirty.progress = (totalsCount / totals) * 100;
+
 					// testy = path.match(/.*[a-zA-Z].*[0-9]/); // just a useless regex to make it do something each item
 					// testy = item.name.match(/.*[a-zA-Z].*[0-9]/); // just a useless regex to make it do something each item
 					// files+=' '+path+item.name;
@@ -516,9 +524,10 @@ $.generate.addEventListener('click', function(e) {
 					createDates(item);
 					// testy = item.name.match(/.*[a-zA-Z].*[0-9]/); // just a useless regex to make it do something each item
 					// files+=' '+path+item.name;
-					fCount++;
+					fCount+=1;
 					totalsCount += 1;
 					list += template['file'].func(item, path, date, dateRaw);
+					dirty.progress = (totalsCount / totals) * 100;
 				}
 			});
 		}
