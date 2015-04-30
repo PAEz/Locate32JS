@@ -469,7 +469,7 @@ $.generate.el.addEventListener('click', function(e) {
 	var totals = 0,
 		totalsCount = 0,
 		volumes = [];
-for(var i=0;i<3;i++){
+// for(var i=0;i<3;i++){
 	[].forEach.call($.rootList.querySelectorAll('input[type="checkbox"]'), function(el) {
 		if (el.checked) {
 			var v = el.getAttribute('volume');
@@ -478,7 +478,7 @@ for(var i=0;i<3;i++){
 			volumes.push(v);
 		}
 	})
-}
+// }
 	if (!volumes.length) return;
 	volumes.reverse();
 
