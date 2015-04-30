@@ -310,12 +310,13 @@ var Bytes = (function() {
 		},
 
 		findNull16: function(index, end) {
-		  var i = index,end=end||this.length;
-		    while (this[i] !== 0 || this[i+1] !== 0) {
-		      if (i >= end) return end;
-		      i += 2;
-		    }
-		    return i;
+			var i = index,
+				end = end || this.length;
+			while (this[i] !== 0 || this[i + 1] !== 0) {
+				if (i >= end) return end;
+				i += 2;
+			}
+			return i;
 		},
 
 		lastIndexOf: function(sub, idx, lastIdx) {
@@ -521,27 +522,46 @@ var Bytes = (function() {
 		}
 		return result;
 	}
+	// tentative change to see if string will work over array
+	// looks like it does and it shaves another second off 500,000 items
+	// Also removed the bigEndian stuff as it doenst relate to locate32 and slowed things down
+	// function readUTF16String(bytes/*, bigEndian*/, maxBytes) {
+	// 	var ix = 0;
+	// 	var offset1 = 1,
+	// 		offset2 = 0;
+	// 	maxBytes = Math.min(maxBytes || bytes.length, bytes.length);
+	// 	var arr="";
+	// 	for (var j = 0; ix < maxBytes; ++j) {
+	// 		// while(ix < maxBytes){
+	// 		var byte1 = bytes[ix + offset1];
+	// 		var byte2 = bytes[ix + offset2];
+	// 		var word1 = (byte1 << 8) + byte2;
+	// 		ix += 2;
+	// 		if (word1 == 0x0000) {
+	// 			break;
+	// 		} else if (byte1 < 0xD8 || byte1 >= 0xE0) {
+	// 			arr += String.fromCharCode(word1);
+	// 		} else {
+	// 			var byte3 = bytes[ix + offset1];
+	// 			var byte4 = bytes[ix + offset2];
+	// 			var word2 = (byte3 << 8) + byte4;
+	// 			ix += 2;
+	// 			arr += String.fromCharCode(word1, word2);
+	// 		}
+	// 	}
+	// 	return arr;
+	// }
 
-	function readUTF16String(bytes, bigEndian, maxBytes) {
-		var ix = 0;
-		var offset1 = 1,
-			offset2 = 0;
-		maxBytes = Math.min(maxBytes || bytes.length, bytes.length);
-
-		if (bytes[0] == 0xFE && bytes[1] == 0xFF) {
-			bigEndian = true;
-			ix = 2;
-		} else if (bytes[0] == 0xFF && bytes[1] == 0xFE) {
-			bigEndian = false;
-			ix = 2;
-		}
-		if (bigEndian) {
-			offset1 = 0;
-			offset2 = 1;
-		}
-
-		var arr = [];
-		for (var j = 0; ix < maxBytes; j++) {
+	// tentative change to see if string will work over array
+	// looks like it does and it shaves another second off 500,000 items
+	// Also removed the bigEndian stuff as it doenst relate to locate32 and slowed things down
+	function readUTF16String(bytes) {
+		var ix = 0,
+			offset1 = 1,
+			offset2 = 0,
+			arr = "",
+			maxBytes = bytes.length;
+		while (ix < maxBytes) {
 			var byte1 = bytes[ix + offset1];
 			var byte2 = bytes[ix + offset2];
 			var word1 = (byte1 << 8) + byte2;
@@ -549,19 +569,14 @@ var Bytes = (function() {
 			if (word1 == 0x0000) {
 				break;
 			} else if (byte1 < 0xD8 || byte1 >= 0xE0) {
-				arr[j] = String.fromCharCode(word1);
+				arr += String.fromCharCode(word1);
 			} else {
-				var byte3 = bytes[ix + offset1];
-				var byte4 = bytes[ix + offset2];
-				var word2 = (byte3 << 8) + byte4;
+				var word2 = (byte1 << 8) + byte2;
 				ix += 2;
-				arr[j] = String.fromCharCode(word1, word2);
+				arr += String.fromCharCode(word1, word2);
 			}
 		}
-		// var string = new String(arr.join(""));
-		var string = arr.join("");
-		string.bytesReadCount = ix;
-		return string;
+		return arr;
 	}
 
 	function readUTF8String(bytes, maxBytes) {
@@ -570,7 +585,7 @@ var Bytes = (function() {
 		for (var nPart, nLen = bytes.length, nIdx = 0; nIdx < nLen; nIdx++) {
 			nPart = bytes[nIdx];
 			///PAEz
-			if (nPart===0)break;
+			if (nPart === 0) break;
 			sView += String.fromCharCode(
 				nPart > 251 && nPart < 254 && nIdx + 5 < nLen ? /* six bytes */
 				/* (nPart - 252 << 30) may be not so safe in ECMAScript! So...: */

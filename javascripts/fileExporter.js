@@ -1,38 +1,110 @@
-var $ = {
-	rootList: document.querySelector('#rootlist'),
-	load: document.querySelector('#load'),
-	fileInput: document.querySelector('#fileinput'),
-	generate: document.querySelector('#generate'),
-	save: document.querySelector('#save'),
-	progress: document.querySelector('#progress'),
-	template: {
-		container: document.querySelector('div.template'),
-		header: document.querySelector('div.template [name="header"]'),
-		root: document.querySelector('div.template [name="root"]'),
-		file: document.querySelector('div.template [name="file"]'),
-		directory: document.querySelector('div.template [name="directory"]'),
-		// dirend: document.querySelector('div.template [name="dirend"]'),
-		// rootend: document.querySelector('div.template [name="rootend"]'),
-		footer: document.querySelector('div.template [name="footer"]'),
-	},
-	legend: {
-		container: document.querySelector('div.legend'),
-		root: document.querySelector('div.legend .root'),
-		directory: document.querySelector('div.legend .directory'),
-		file: document.querySelector('div.legend .file'),
-		end: document.querySelector('div.legend .end'),
+// dummy locate to keep onFrame happy until one is initiated
+var locate = {
+	scan: {
+		scanning: false
 	}
+};
+
+var $ = {
+	progress: {
+		el: document.querySelector('#progress'),
+		value: 0
+	},
+	load: {
+		el: document.querySelector('#load'),
+		enabled: true
+	},
+	generate: {
+		el: document.querySelector('#generate'),
+		enabled: false
+	},
+	save: {
+		el: document.querySelector('#save'),
+		enabled: false
+	},
+	rootList: document.querySelector('#rootlist'),
+	fileInput: document.querySelector('#fileinput'),
+	template: document.querySelector('div.template'),
+	legend: document.querySelector('div.legend')
+};
+
+var $Keys = Object.keys($);
+$Keys.forEach(function(key) {
+	var el = $[key];
+	if (el.enabled !== undefined) {
+		if (el.enabled) {
+			el.el.removeAttribute('disabled');
+		} else {
+			el.el.setAttribute('disabled', '');
+		}
+		el.enabled = function(bool) {
+			if (bool === undefined) bool = true;
+			if (bool) {
+				this.el.removeAttribute('disabled');
+			} else {
+				this.el.setAttribute('disabled', '');
+			}
+		}
+	}
+})
+
+
+function onFrame() {
+	if ($.progress.value !== $.progress.valueLast) {
+		$.progress.el.style.width = $.progress.value + '%';
+		$.progress.valueLast = $.progress.value;
+	} else if (locate.scan.scanning == false) {
+		var update = false;
+		for (var i = 0, iEnd = templateKeys.length; i < iEnd; i += 1) {
+			var key = templateKeys[i];
+			if (template[key].dirty) {
+				template[key].dirty = false;
+				templateData[key] = template[key].el.value;
+				update = true;
+			}
+		}
+		if (update) {
+			localStorage['templateData'] = JSON.stringify(templateData);
+		}
+	}
+	window.requestAnimationFrame(onFrame);
 }
 
-var dirty = {};
-Object.keys($.template).forEach(function(key) {
-	dirty[key] = false;
+window.requestAnimationFrame(onFrame);
+
+
+
+$.fileInput.addEventListener('change', function(e) {
+	var files = e.target.files || e.dataTransfer.files;
+	if (files.length) {
+		var file = files[0];
+		var reader = new FileReader();
+		rootListInfo('Loading......');
+		$.generate.enabled(false);
+		$.save.enabled(false);
+		reader.readAsArrayBuffer(file);
+		reader.onload = function(result) {
+			var ab = result.target.result;
+			locate = new Locate32(ab);
+			if (locate.error) {
+				rootListInfo(locate.error);
+				return;
+			}
+			$.generate.enabled(true);
+			rootList(locate.roots);
+		}
+	}
+
+})
+
+$.save.el.addEventListener('click', function(e) {
+	save(list);
 });
-dirty.progress = 0;
-dirty.progressLast = 0;
+// the generate click event is at the end of the code
 
 var template = {
 	header: {
+		el:document.querySelector('div.template [name="header"]'),
 		dirty: false,
 		func: null,
 		args: 'item, date, dateRaw',
@@ -54,6 +126,7 @@ var template = {
 		}
 	},
 	root: {
+		el:document.querySelector('div.template [name="root"]'),
 		dirty: false,
 		func: null,
 		args: 'item, date, dateRaw',
@@ -79,6 +152,7 @@ var template = {
 		}
 	},
 	directory: {
+		el:document.querySelector('div.template [name="directory"]'),
 		dirty: false,
 		func: null,
 		args: 'item, path, date, dateRaw',
@@ -112,6 +186,7 @@ var template = {
 		}
 	},
 	file: {
+		el:document.querySelector('div.template [name="file"]'),
 		dirty: false,
 		func: null,
 		args: 'item, path, date, dateRaw',
@@ -170,6 +245,7 @@ var template = {
 	//   }
 	// },
 	footer: {
+		el:document.querySelector('div.template [name="footer"]'),
 		dirty: false,
 		func: null,
 		args: 'item, date, dateRaw',
@@ -194,41 +270,32 @@ var template = {
 
 var templateKeys = Object.keys(template);
 
+templateKeys.forEach(function(legend) {
+	var el = template[legend].el;
+
+	el.addEventListener('focus', function(e) {
+		$.legend.setAttribute('legend', el.getAttribute('name'));
+	});
+
+	el.addEventListener('input', function(e) {
+		template[el.name].dirty = true;
+	});
+});
+
 var templateData = {};
 
 if (localStorage['templateData'] !== undefined) templateData = JSON.parse(localStorage['templateData']);
 
 templateKeys.forEach(function(key) {
-	if (templateData[key]) $.template[key].value = templateData[key];
+	if (templateData[key]) template[key].el.value = templateData[key];
 })
 
-function onFrame() {
-	if (dirty.progress !== dirty.progressLast) {
-		$.progress.style.width = dirty.progress + '%';
-		dirty.progressLast = dirty.progress;
-	} else {
-		var update = false;
-		for (var i = 0, iEnd = templateKeys.length; i < iEnd; i += 1) {
-			var key = templateKeys[i];
-			if (template[key].dirty) {
-				template[key].dirty = false;
-				templateData[key] = $.template[key].value;
-				update = true;
-			}
-		}
-		if (update) {
-			localStorage['templateData'] = JSON.stringify(templateData);
-		}
-	}
-	window.requestAnimationFrame(onFrame);
-}
 
-window.requestAnimationFrame(onFrame);
 
 function createTemplate(section, str) {
 	var args = template[section].args;
 	var keys = template[section].keys;
-	this.undefinedKeys = [];
+	var undefinedKeys = [];
 	str = str.replace(/(?:\r\n|\r|\n)/g, '\r\n')
 	str = JSON.stringify(str);
 
@@ -246,10 +313,10 @@ function createTemplate(section, str) {
 function createTemplates(templates) {
 	var keys = Object.keys(templates);
 	for (var i = 0, iEnd = keys.length; i < iEnd; i += 1) {
-		var template = keys[i];
-		var temp = createTemplate(template, $.template[template].value.toString());
+		var key = keys[i];
+		var temp = createTemplate(key, template[key].el.value.toString());
 		if (temp !== true) {
-			temp.template = template;
+			temp.template = key;
 			return temp;
 		}
 	}
@@ -270,8 +337,8 @@ function rootList(roots) {
 		volumeLabel = document.createElement('label');
 		volumeLabel.classList.add('checkbox');
 		volumeLabel.setAttribute('for', 'volume' + index);
-		volumeLabel.innerText = root.path + '/';
-		volumeLabel.setAttribute('title', root.path + '/');
+		volumeLabel.innerText = root.path + '\\';
+		volumeLabel.setAttribute('title', root.path + '\\');
 		var info1 = document.createElement('span');
 		info1.classList.add("info");
 		info1.appendChild(document.createTextNode("Files: "));
@@ -304,46 +371,6 @@ function rootListInfo(wot) {
 	li.appendChild(text);
 	$.rootList.appendChild(li);
 }
-
-Object.keys($.template).forEach(function(legend) {
-	if (legend != 'container') {
-		var el = $.template[legend];
-
-		el.addEventListener('focus', function(e) {
-			$.legend.container.setAttribute('legend', el.getAttribute('name'));
-		});
-
-		el.addEventListener('input', function(e) {
-			// $.legend.container.setAttribute('legend', el.getAttribute('name'));
-			console.log(el.name)
-			template[el.name].dirty = true;
-
-		});
-	}
-})
-
-$.fileInput.addEventListener('change', function(e) {
-	var files = e.target.files || e.dataTransfer.files;
-	if (files.length) {
-		var file = files[0];
-		var reader = new FileReader();
-		rootListInfo('Loading......');
-		$.generate.setAttribute('disabled', '');
-		$.save.setAttribute('disabled', '');
-		reader.readAsArrayBuffer(file);
-		reader.onload = function(result) {
-			var ab = result.target.result;
-			locate = new Locate32(ab);
-			if (locate.error) {
-				rootListInfo(locate.error);
-				return;
-			}
-			$.generate.removeAttribute('disabled');
-			rootList(locate.roots);
-		}
-	}
-
-})
 
 
 function createDates(item) {
@@ -408,27 +435,41 @@ function save(wot, filename) {
 		t = 'application/binary';
 	a.onclick = function() {
 		URL.revokeObjectURL(blob);
+		delete blob;
 	};
 	a.download = filename;
 	a.href = URL.createObjectURL(blob);
-	a.dataset.downloadurl = t + ':' + a.download + ':' + a.href;
+	e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
+	a.dispatchEvent(e)
+}
+function save(wot, filename) {
+	var enc=new TextEncoder('utf8');
+	filename = filename || 'output.txt';
+	var blob = new Blob([enc.encode(wot)], {
+			type: t
+		}),
+		e = document.createEvent('MouseEvents'),
+		a = document.createElement('a'),
+		t = 'application/binary';
+	a.onclick = function() {
+		URL.revokeObjectURL(blob);
+		delete blob;
+	};
+	a.download = filename;
+	a.href = URL.createObjectURL(blob);
 	e.initMouseEvent('click', true, false, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null)
 	a.dispatchEvent(e)
 }
 
+
 rootListInfo('Load a DB to get started');
 var list = '';
-// var dCount=0,fCount=0,tdCount=0,tfCount=0;
-// var totals=0,totalsCount=0;
 
-$.generate.addEventListener('click', function(e) {
-	var dCount = 0,
-		fCount = 0,
-		tdCount = 0,
-		tfCount = 0;
+$.generate.el.addEventListener('click', function(e) {
 	var totals = 0,
-		totalsCount = 0;
-	var volumes = [];
+		totalsCount = 0,
+		volumes = [];
+for(var i=0;i<3;i++){
 	[].forEach.call($.rootList.querySelectorAll('input[type="checkbox"]'), function(el) {
 		if (el.checked) {
 			var v = el.getAttribute('volume');
@@ -437,23 +478,22 @@ $.generate.addEventListener('click', function(e) {
 			volumes.push(v);
 		}
 	})
-	// console.log('totals',totals);
+}
 	if (!volumes.length) return;
-	$.save.setAttribute('disabled', '');
-	$.load.setAttribute('disabled', '');
-	$.generate.setAttribute('disabled', '');
+	volumes.reverse();
+
+	$.save.enabled(false);
+	$.load.enabled(false);
+	$.generate.enabled(false);
+
 	list = '';
-	dCount = 0;
-	fCount = 0;
-	// totals=0;
+
 	totalsCount = 0;
 	var temp = createTemplates(template);
 	if (temp === true) {
 		var dateRaw = new Date();
 		var date = dateRaw.toString();
 		dateRaw = dateRaw.getTime();
-		var dCount = 0,
-			fCount = 0;
 
 		// Header
 		createDates(locate.header);
@@ -463,71 +503,35 @@ $.generate.addEventListener('click', function(e) {
 
 		function scanIt(index) {
 			createDates(locate.roots[index]);
-			list += template['root'].func(locate.roots[index], date, dateRaw);
+			list += template.root.func(locate.roots[index], date, dateRaw);
 
 			locate.roots[index].scan(function(item, path) {
 				if (item.event) {
-
-					switch (item.event) {
-
-						case 'end':
-							// console.log('Scan Complete');
-
-							// console.log('Directories:', dCount, 'Files:', fCount, "Toatal:", fCount + dCount);
-							dCount = 0;
-							fCount = 0;
-							var next = volumes.pop();
-							if (next) scanIt(next);
-							else {
-								// true end
-								console.timeEnd('Scan Took');
-								console.log('totals', totals)
-								list += template['footer'].func(locate.header, date, dateRaw);
-								$.save.removeAttribute('disabled');
-								$.load.removeAttribute('disabled');
-								$.generate.removeAttribute('disabled');
-								// $.progress.style.width = '0%';
-								dirty.progress = 0;
-							}
-							return;
-							// console.log(files)
-							break;
-
-						case 'pause':
-							console.log('Scan Paused');
-							console.timeEnd('Amount of time to pause');
-							break;
-
-						case 'continue':
-							console.log('Scan Continuing');
-							break;
-
-						case 'updir':
-							/*
-                This event is called whenever we leave a directory and are back in its parent
-                You can use this with the rest to reconstruct full trees if you want
-              */
-							// console.log('updir');
-							break;
+					if (item.event == 'end') {
+						var next = volumes.pop();
+						if (next) scanIt(next);
+						else {
+							// true end
+							console.timeEnd('Scan Took');
+							console.log('totals', totals)
+							list += template['footer'].func(locate.header, date, dateRaw);
+							$.save.enabled(true);
+							$.load.enabled(true);
+							$.generate.enabled(true);
+							$.progress.value = 0;
+						}
+						return;
 					}
 				} else if (item.attrs.directory) {
 					createDates(item);
-					dCount+=1;
-					list += template['directory'].func(item, path, date, dateRaw);
+					list += template.directory.func(item, path, date, dateRaw);
 					totalsCount += 1;
-					dirty.progress = (totalsCount / totals) * 100;
-
-					// testy = path.match(/.*[a-zA-Z].*[0-9]/); // just a useless regex to make it do something each item
-					// testy = item.name.match(/.*[a-zA-Z].*[0-9]/); // just a useless regex to make it do something each item
-					// files+=' '+path+item.name;
+					$.progress.value = (totalsCount / totals) * 100;
 				} else {
 					createDates(item);
-					// testy = item.name.match(/.*[a-zA-Z].*[0-9]/); // just a useless regex to make it do something each item
-					// files+=' '+path+item.name;
-					fCount+=1;
 					totalsCount += 1;
-					list += template['file'].func(item, path, date, dateRaw);
-					dirty.progress = (totalsCount / totals) * 100;
+					list += template.file.func(item, path, date, dateRaw);
+					$.progress.value = (totalsCount / totals) * 100;
 				}
 			});
 		}
@@ -536,14 +540,9 @@ $.generate.addEventListener('click', function(e) {
 
 	} else {
 		alert('Unable to generate template.\nUnkown variable/s...\n' + temp.join(', ') + '\n...was used in...\n' + temp.template);
-		$.save.setAttribute('disabled', '');
-		$.load.removeAttribute('disabled');
-		$.generate.removeAttribute('disabled');
+		$.save.enabled(false);
+		$.load.enabled(true);
+		$.generate.enabled(true);
 	}
 
-});
-
-$.save.addEventListener('click', function(e) {
-
-	save(list);
 });

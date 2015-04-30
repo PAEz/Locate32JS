@@ -35,10 +35,11 @@ Chunks.prototype.getString = function(encoding, length) {
     case 'utf16':
     case 'utf16le':
     case 'utf16be':
-      if (length === undefined) {
-        end = this.buffer.findNull16(this.index);
-        nulls = 2;
-      }
+      // if (length === undefined) {
+      //   end = this.buffer.findNull16(this.index);
+      //   nulls = 2;
+      // }
+      return this.getUTF16(length);
       break;
 
     default:
@@ -57,6 +58,36 @@ Chunks.prototype.getString = function(encoding, length) {
   this.index = end + nulls;
   if (this.index > this.buffer.length) this.index = this.buffer.length;
   return value;
+};
+
+// moved this in from Bytes to make it quicker, saved me about 2 seconds for 476000 items
+Chunks.prototype.getUTF16 = function(length) {
+  if(length){
+    length+=this.index;
+    if(length>this.buffer.length)length=this.buffer.length;
+  }else{
+    length=this.buffer.length;
+  }
+    var ix = this.index,
+      arr = "";
+
+    while (ix < length) {
+      var byte1 = this.buffer[ix + 1];
+      var byte2 = this.buffer[ix];
+      var word1 = (byte1 << 8) + byte2;
+      ix += 2;
+      if (word1 == 0x0000) {
+        break;
+      } else if (byte1 < 0xD8 || byte1 >= 0xE0) {
+        arr += String.fromCharCode(word1);
+      } else {
+        var word2 = (this.buffer[ix + 1] << 8) + this.buffer[ix];
+        ix += 2;
+        arr += String.fromCharCode(word1, word2);
+      }
+    }
+    this.index=ix;
+    return arr;
 };
 
 Chunks.prototype.getInt8 = function() {
